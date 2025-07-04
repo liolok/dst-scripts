@@ -43,36 +43,53 @@ local events =
             inst.sg:GoToState("relocate")
         end
     end),
+
+    EventHandler("force_relocate", function(inst)
+        if not (inst.sg:HasStateTag("busy")) then
+            inst.sg:GoToState("relocate")
+        end
+    end),
 }
 
+--NOTE: these are stategraph tags!
 local INVALID_ATTACK_STATE_TAGS = {"bedroll", "knockout", "sleeping", "tent", "waking"}
-local function TargetTestFn(target, inst)
-    return not IsEntityDeadOrGhost(target)
-        and (target.sg == nil or not target.sg:HasAnyStateTag(INVALID_ATTACK_STATE_TAGS))
+local function IsValidAttackTarget(inst, target, x, z, rangesq)
+	local dsq = target:GetDistanceSqToPoint(x, 0, z)
+	return dsq < rangesq
+		and not (target.components.health and target.components.health:IsDead())
+		and not (target.sg and target.sg:HasAnyStateTag(INVALID_ATTACK_STATE_TAGS))
+		and not target:HasAnyTag("brightmare", "brightmareboss")
+		and inst.components.combat:CanTarget(target)
+		, dsq
+end
+
+--These tags and testfn are used with DoAreaAttack below,
+--and should give the same result as IsValidAttackTarget.
+local AREAATTACK_EXCLUDETAGS = { "INLIMBO", "notarget", "invisible", "noattack", "flight", "playerghost", "brightmare", "brightmareboss" }
+local function AreaAttackTestFn(target, inst)
+	return not (target.components.health and target.components.health:IsDead())
+		and not (target.sg and target.sg:HasAnyStateTag(INVALID_ATTACK_STATE_TAGS))
 		and inst.components.combat:CanTarget(target)
 end
+
 local function FindBestAttackTarget(inst)
 	local x, y, z = inst.Transform:GetWorldPosition()
 	local rangesq = TUNING.GESTALT_ATTACK_HIT_RANGE_SQ
 
-    local combat_target = inst.components.combat.target
-    if combat_target
-            and TargetTestFn(combat_target, inst)
-            and combat_target:GetDistanceSqToPoint(x, y, z) <= rangesq then
-        return combat_target
+	local target = inst.components.combat.target
+	if target and IsValidAttackTarget(inst, target, x, z, rangesq) then
+		return target
     end
 
-    local closestPlayer = nil
+	target = nil
     for _, player in pairs(AllPlayers) do
-        if TargetTestFn(player, inst) then
-            local distsq = player:GetDistanceSqToPoint(x, y, z)
-            if distsq < rangesq then
-                rangesq = distsq
-                closestPlayer = player
-            end
+		local isvalid, dsq = IsValidAttackTarget(inst, player, x, z, rangesq)
+		if isvalid then
+			rangesq = dsq
+			target = player
         end
     end
-    return closestPlayer
+	return target
 end
 
 local function DoSpecialAttack(inst, target)
@@ -102,11 +119,17 @@ local states =
             inst.AnimState:PlayAnimation("idle")
 
             inst.SoundEmitter:PlaySound("rifts5/gestalt_evolved/idle_LP", "idle_lp")
+
+            if inst._do_despawn then
+                inst.sg:GoToState("relocate")
+            end
         end,
 
         events =
         {
-            EventHandler("animover", go_to_idle),
+            EventHandler("animover", function(inst)
+                inst.sg:GoToState((inst._do_despawn and "relocate") or "idle")
+            end),
         },
 
         onexit = function(inst)
@@ -185,7 +208,11 @@ local states =
         events =
         {
             EventHandler("animover", function(inst)
-				inst.sg:GoToState("relocating")
+                if inst._do_despawn then
+                    inst:Remove()
+                else
+				    inst.sg:GoToState("relocating")
+                end
 			end),
         },
     },
@@ -298,7 +325,7 @@ local states =
         timeline =
         {
             FrameEvent(28, function(inst)
-                inst.components.combat:DoAreaAttack(inst, 4, nil, TargetTestFn)
+				inst.components.combat:DoAreaAttack(inst, 4, nil, AreaAttackTestFn, nil, AREAATTACK_EXCLUDETAGS)
             end),
         },
 
