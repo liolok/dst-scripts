@@ -1,0 +1,2 @@
+# tells Git not to attempt any end-of-line conversion upon checkin or checkout.
+* -text
