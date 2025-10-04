@@ -987,12 +987,27 @@ function self:OnUpdate(dt)
     if self.updateaccumulator > self.UPDATE_TICK_TIME then
         self.updateaccumulator = 0
 
-        local aplayerisinanyvault = false
+        local aplayerisonshard = false
         for _, player in ipairs(AllPlayers) do
             self:TryToAdjustTrackingPlayer(player)
-            if not aplayerisinanyvault then
-                local x, y, z = player.Transform:GetWorldPosition()
-                aplayerisinanyvault = _map:IsPointInAnyVault(x, y, z)
+            aplayerisonshard = true
+        end
+
+        if aplayerisonshard then
+            self.cachedroomrotatesindex = nil
+            self.cachedroomrotates = nil
+        elseif self.cachedroomrotates == nil then
+            self.cachedroomrotatesindex = 0
+            self.cachedroomrotates = {
+                [1] = 1,
+            }
+            for roomindex = 2, self.maxroomindex do
+                if roomindex ~= 6 then -- FIXME(JBK): Rifts6.1 super hack room "key1" is not defined yet.
+                    local roomdata = self.rooms[roomindex]
+                    if roomdata and roomdata.vaultroomdata then
+                        table.insert(self.cachedroomrotates, roomindex)
+                    end
+                end
             end
         end
 
@@ -1014,13 +1029,18 @@ function self:OnUpdate(dt)
                 targetroom = 1
             elseif self._needsreloaded then
                 targetroom = self.roomindex
-            elseif not aplayerisinanyvault then
+            elseif not aplayerisonshard then
                 local cooldownticks = self.updaterotatecooldownticks - 1
                 if cooldownticks <= 0 then
                     self.updaterotatecooldownticks = self.UPDATE_ROTATE_ROOMS_COOLDOWN_TICKS_COUNT
-                    targetroom = math.random(1, self.maxroomindex)
-                    if targetroom == 6 then -- FIXME(JBK): Rifts6.1 super hack room "key1" is not defined yet.
-                        targetroom = 1
+
+                    self.cachedroomrotatesindex = self.cachedroomrotatesindex + 1
+                    if self.cachedroomrotatesindex > #self.cachedroomrotates then
+                        self.cachedroomrotatesindex = 1
+                    end
+                    local newroomindex = self.cachedroomrotates[self.cachedroomrotatesindex]
+                    if newroomindex ~= self.roomindex then
+                        targetroom = newroomindex
                     end
                 else
                     self.updaterotatecooldownticks = cooldownticks
