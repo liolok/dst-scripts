@@ -1,6 +1,6 @@
 #!/usr/bin/env fish
 
-set steam_lib $HOME/steam-library
+set steam_lib $HOME/nvme/steam-library
 set dst_dir "$steam_lib/common/Don't Starve Together"
 
 set upstream_version (string trim (cat $dst_dir/version.txt))
