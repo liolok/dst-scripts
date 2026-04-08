@@ -129,6 +129,7 @@ PREFAB_SKINS = {
 		"armor_wood_haramaki",
 		"armor_wood_lamellar",
 		"armor_wood_roman",
+		"armor_wood_rw_gustree",
 	},
 	arrowsign_post =
 	{
@@ -170,6 +171,7 @@ PREFAB_SKINS = {
 		"backpack_glommer_resurrected",
 		"backpack_heart",
 		"backpack_hound",
+		"backpack_invisible",
 		"backpack_koalefant",
 		"backpack_labrat",
 		"backpack_mandrake",
@@ -454,6 +456,14 @@ PREFAB_SKINS = {
 		"cookpot_survival",
 		"cookpot_tureen",
 	},
+	critter_bulbin =
+	{
+		"bulbin_rw_basic",
+	},
+	critter_bulbin_builder =
+	{
+		"bulbin_rw_basic_builder",
+	},
 	critter_dragonling =
 	{
 		"dragonling_bat",
@@ -673,6 +683,7 @@ PREFAB_SKINS = {
 		"eyebrellahat_adventure",
 		"eyebrellahat_crystal",
 		"eyebrellahat_fantasy",
+		"eyebrellahat_insect",
 		"eyebrellahat_rose",
 		"eyebrellahat_victorian",
 	},
@@ -778,6 +789,7 @@ PREFAB_SKINS = {
 		"firestaff_meteor",
 		"firestaff_northern",
 		"firestaff_rose",
+		"firestaff_rw_swamp",
 	},
 	firesuppressor =
 	{
@@ -813,6 +825,7 @@ PREFAB_SKINS = {
 		"footballhat_combathelm",
 		"footballhat_combathelm2",
 		"footballhat_hockey",
+		"footballhat_rw_gustree",
 		"footballhat_western",
 		"hat_dog_helm",
 	},
@@ -900,6 +913,7 @@ PREFAB_SKINS = {
 		"hammer_forge",
 		"hammer_hammush",
 		"hammer_invisible",
+		"hammer_rw_startingforest",
 	},
 	hawaiianshirt =
 	{
@@ -1017,6 +1031,7 @@ PREFAB_SKINS = {
 		"icestaff_lance",
 		"icestaff_northern",
 		"icestaff_rose",
+		"icestaff_rw_swamp",
 	},
 	insanityrock =
 	{
@@ -1645,6 +1660,7 @@ PREFAB_SKINS = {
 		"spear_northern",
 		"spear_ragged",
 		"spear_rose",
+		"spear_rw_swamp",
 		"spear_simple",
 	},
 	spear_wathgrithr =
@@ -1896,6 +1912,10 @@ PREFAB_SKINS = {
 		"umbrella_heart",
 		"umbrella_parasol",
 		"umbrella_spider",
+	},
+	w_radio =
+	{
+		"w_radio_basic",
 	},
 	wagdrone_rolling =
 	{
@@ -2742,6 +2762,9 @@ PREFAB_SKINS_SHOULD_NOT_SELECT = {
 	["treasurechest_upgraded_traincase"] = true,
 	["treasurechest_upgraded_traveltrunk"] = true,
 	["treasurechest_upgraded_vintage"] = true,
+	["w_radio"] = true,
+	["critter_bulbin"] = true,
+	["critter_bulbin_builder"] = true,
 }
 
 
