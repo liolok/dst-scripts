@@ -730,6 +730,7 @@ local book_defs =
                 for _, item in ipairs(items) do
                     if item.components.inventoryitem ~= nil then
                         item.components.inventoryitem:DryMoisture()
+                        item.components.inventoryitem:SetTemperature(TUNING.BOOK_TEMPERATURE_AMOUNT)
                     end
                 end
             end
